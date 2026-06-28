@@ -17,6 +17,7 @@ public class EnemyAI : MonoBehaviour
         rb.freezeRotation = true;
         var p = GameObject.FindGameObjectWithTag("Player");
         if (p) player = p.transform;
+        CharacterStyleManager.Instance?.ApplyToEnemies();
     }
 
     void FixedUpdate()

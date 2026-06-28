@@ -29,6 +29,7 @@ public class PopMagicPlayer : MonoBehaviour
         mainCamera = Camera.main;
         var sm = SettingsManager.Instance;
         if (sm != null) { moveSpeed = sm.moveSpeed; mpCostPerShot = sm.mpCost; }
+        CharacterStyleManager.Instance?.ApplyToPlayer();
     }
 
     void Update()

@@ -44,6 +44,10 @@ public class MagicProjectile : MonoBehaviour
         ApplyBlocks();
         rb.linearVelocity = moveDir * speed;
         Destroy(gameObject, lifetime);
+        var magicSprite = CharacterStyleManager.Instance?.GetMagicSprite();
+        if (magicSprite != null) ApplyColor(Color.white);
+        var sr2 = GetComponent<SpriteRenderer>();
+        if (sr2 != null && magicSprite != null) sr2.sprite = magicSprite;
     }
 
     void ApplyBlocks()

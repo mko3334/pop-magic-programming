@@ -193,6 +193,9 @@ public class SettingsUI : MonoBehaviour
         MakeRow(contentGO.transform, "ハート数", 1f, 10f, 1f, true, rowIdx++, () => sm.maxHearts, v => { sm.maxHearts = (int)v; ApplyToHUD(); });
         MakeRow(contentGO.transform, "月数",     1f, 10f, 1f, true, rowIdx++, () => sm.maxMoons,  v => { sm.maxMoons  = (int)v; ApplyToHUD(); });
 
+        // キャラクター編集ボタン
+        BuildCharacterEditorButton(contentGO.transform);
+
         // リセットボタン
         BuildResetButton(contentGO.transform);
     }
@@ -322,6 +325,49 @@ public class SettingsUI : MonoBehaviour
     void UpdateValueText(Text t, float v, bool isInt)
     {
         t.text = isInt ? ((int)v).ToString() : v.ToString("F1");
+    }
+
+    void BuildCharacterEditorButton(Transform parent)
+    {
+        var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+        BuildSectionHeader(parent, "キャラクター", new Color(1f, 0.84f, 0.68f));
+
+        var row = new GameObject("CharBtn");
+        row.transform.SetParent(parent, false);
+        row.AddComponent<LayoutElement>().preferredHeight = 72f;
+
+        var hl = row.AddComponent<HorizontalLayoutGroup>();
+        hl.childForceExpandHeight = true;
+        hl.childForceExpandWidth = false;
+        hl.childAlignment = TextAnchor.MiddleCenter;
+        hl.padding = new RectOffset(20, 20, 8, 8);
+
+        var btnGO = new GameObject("Btn");
+        btnGO.transform.SetParent(row.transform, false);
+        var le = btnGO.AddComponent<LayoutElement>();
+        le.preferredHeight = 56f;
+        le.flexibleWidth = 1f;
+        var img = btnGO.AddComponent<Image>();
+        img.color = new Color(0.82f, 0.68f, 1f);
+        var btn = btnGO.AddComponent<Button>();
+        btn.targetGraphic = img;
+        btn.onClick.AddListener(() => { Close(); CharacterEditorUI.Instance?.Open(); });
+
+        var tGO = new GameObject("T");
+        tGO.transform.SetParent(btnGO.transform, false);
+        var t = tGO.AddComponent<Text>();
+        t.text = "👤  プレイヤー・敵・魔法の見た目を編集  →";
+        t.font = font;
+        t.fontSize = 22;
+        t.fontStyle = FontStyle.Bold;
+        t.color = Color.white;
+        t.alignment = TextAnchor.MiddleCenter;
+        t.raycastTarget = false;
+        var tr = tGO.AddComponent<RectTransform>();
+        tr.anchorMin = Vector2.zero;
+        tr.anchorMax = Vector2.one;
+        tr.sizeDelta = Vector2.zero;
     }
 
     void BuildResetButton(Transform parent)
