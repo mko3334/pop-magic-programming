@@ -1,0 +1,32 @@
+# Unity生成フォルダ
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Unity meta以外のOS系
+.DS_Store
+Thumbs.db
+
+# Visual Studio
+*.csproj
+*.sln
+*.slnx
+*.user
+*.suo
+*.userprefs
+.vs/
+
+# JetBrains
+.idea/
+
+# ビルド成果物
+*.apk
+*.aab
+*.unitypackage
+
+# キャッシュ
+[Aa]ssets/[Aa]sset[Ss]tore-5.x/
