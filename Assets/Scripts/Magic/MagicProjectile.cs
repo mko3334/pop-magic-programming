@@ -28,6 +28,8 @@ public class MagicProjectile : MonoBehaviour
 
     // 属性
     private BlockType element = BlockType.Fire;
+    private bool isPiercing;
+    private HashSet<GameObject> hitEnemies = new HashSet<GameObject>();
 
     void Awake()
     {
@@ -56,6 +58,7 @@ public class MagicProjectile : MonoBehaviour
                 case BlockType.Water:     element = b; damage = 8f;  ApplyColor(new Color(0.2f,0.6f,1f)); speed = 5f; break;
                 case BlockType.Wood:      element = b; damage = 10f; ApplyColor(new Color(0.2f,0.8f,0.2f)); break;
                 case BlockType.Earth:     element = b; damage = 25f; ApplyColor(new Color(0.6f,0.45f,0.2f)); speed = 4f; break;
+                case BlockType.Light:     element = b; damage = 10f; ApplyColor(new Color(1f,0.98f,0.65f)); speed = 14f; isPiercing = true; break;
 
                 // ベクトル
                 case BlockType.Forward:  break; // デフォルト
@@ -118,8 +121,10 @@ public class MagicProjectile : MonoBehaviour
 
         if (other.CompareTag("Enemy"))
         {
+            if (hitEnemies.Contains(other.gameObject)) return;
+            hitEnemies.Add(other.gameObject);
             HitEnemy(other.gameObject);
-            Destroy(gameObject);
+            if (!isPiercing) Destroy(gameObject);
         }
         else if (!other.isTrigger)
         {

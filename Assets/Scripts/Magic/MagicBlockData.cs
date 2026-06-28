@@ -6,7 +6,7 @@ public enum BlockCategory { Generate, Vector, Trigger, Action, Control }
 public enum BlockType
 {
     // Generate
-    Fire, Lightning, Water, Wood, Earth,
+    Fire, Lightning, Water, Wood, Earth, Light,
     // Vector
     Forward, Homing, Zigzag, Rotate, Return, Bounce,
     // Trigger
@@ -43,6 +43,7 @@ public static class MagicBlockLibrary
         new MagicBlock(BlockType.Water,     "💧", "水",   BlockCategory.Generate, new Color(0.2f,0.6f,1f)),
         new MagicBlock(BlockType.Wood,      "🌿", "木",   BlockCategory.Generate, new Color(0.2f,0.8f,0.2f)),
         new MagicBlock(BlockType.Earth,     "🪨", "土",   BlockCategory.Generate, new Color(0.6f,0.45f,0.2f)),
+        new MagicBlock(BlockType.Light,     "✨", "光",   BlockCategory.Generate, new Color(1f,0.98f,0.65f)),
         // Vector
         new MagicBlock(BlockType.Forward,   "➡", "前へ",  BlockCategory.Vector,   new Color(0.4f,0.7f,1f)),
         new MagicBlock(BlockType.Homing,    "🎯", "ホーミング", BlockCategory.Vector, new Color(1f,0.4f,0.8f)),
