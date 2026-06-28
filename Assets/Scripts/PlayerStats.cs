@@ -56,6 +56,7 @@ public class PlayerStats : MonoBehaviour
             expToNextLevel = Mathf.RoundToInt(expToNextLevel * 1.5f);
             currentHP = maxHP;
             currentMP = maxMP;
+            LevelUpEffect.Show(level);
             onLevelUp?.Invoke();
         }
     }

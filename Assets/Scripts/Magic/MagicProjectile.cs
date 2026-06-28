@@ -16,15 +16,29 @@ public class MagicProjectile : MonoBehaviour
     // 内部状態
     private Rigidbody2D rb;
     private Vector2 moveDir;
-    private int blockIndex = 0;
 
     // ベクトル系
     private bool isHoming;
     private bool isZigzag;
     private bool isBounce;
-    private float zigzagTimer;
+    private bool isRotate;
+    private bool isReturn;
     private int bounceCount = 2;
+    private float zigzagTimer;
+    private float rotateSpeed = 150f;
+    private float returnDelay = 1.5f;
+    private bool hasReturned;
     private Transform homingTarget;
+
+    // トリガー系
+    private bool isWait;
+    private float waitRemaining = 1.5f;
+    private bool isOnHit;
+    private bool isStuck;
+
+    // アクション系
+    private bool isGrow;
+    private float spawnTime;
 
     // 属性
     private BlockType element = BlockType.Fire;
@@ -35,6 +49,7 @@ public class MagicProjectile : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
+        spawnTime = Time.time;
     }
 
     public void Launch(Vector2 direction, List<BlockType> blocks)
@@ -42,11 +57,12 @@ public class MagicProjectile : MonoBehaviour
         moveDir = direction.normalized;
         blockSequence = new List<BlockType>(blocks);
         ApplyBlocks();
-        rb.linearVelocity = moveDir * speed;
+        rb.linearVelocity = isWait ? Vector2.zero : moveDir * speed;
         Destroy(gameObject, lifetime);
+
         var csm = CharacterStyleManager.Instance;
         var magicSpriteName = csm?.GetMagicSpriteName();
-        var magicSprite = (magicSpriteName != null && magicSpriteName.Length > 0) ? csm.FindSprite(magicSpriteName) : null;
+        var magicSprite = !string.IsNullOrEmpty(magicSpriteName) ? csm.FindSprite(magicSpriteName) : null;
         if (magicSprite != null) ApplyColor(Color.white);
         var sr2 = GetComponent<SpriteRenderer>();
         if (sr2 != null && magicSprite != null) sr2.sprite = magicSprite;
@@ -67,22 +83,33 @@ public class MagicProjectile : MonoBehaviour
                 case BlockType.Light:     element = b; damage = Dmg(b); ApplyColor(new Color(1f,0.98f,0.65f)); speed = 14f; isPiercing = true; break;
 
                 // ベクトル
-                case BlockType.Forward:  break; // デフォルト
-                case BlockType.Homing:   isHoming = true; FindHomingTarget(); break;
-                case BlockType.Zigzag:   isZigzag = true; break;
-                case BlockType.Bounce:   isBounce = true; break;
+                case BlockType.Forward: break;
+                case BlockType.Homing:  isHoming = true; FindHomingTarget(); break;
+                case BlockType.Zigzag:  isZigzag = true; break;
+                case BlockType.Bounce:  isBounce = true; break;
+                case BlockType.Rotate:  isRotate = true; break;
+                case BlockType.Return:  isReturn = true; break;
 
-                // アクション（OnHit時に処理）
+                // トリガー
+                case BlockType.Wait:    isWait = true; break;
+                case BlockType.OnHit:   isOnHit = true; break;
+                case BlockType.WaitTap: break;
+
+                // アクション（即時適用）
+                case BlockType.Speed:   speed *= 1.8f; break;
+                case BlockType.Grow:    isGrow = true; break;
+                case BlockType.Fortify: damage *= 1.5f; bounceCount += 3; break;
+
+                // アクション（HitEnemy時）
                 case BlockType.Explode:
                 case BlockType.Split:
                 case BlockType.Attract:
                 case BlockType.Slow:
-                case BlockType.Speed:
+                case BlockType.Stop:
                     break;
             }
         }
 
-        // 雷は生成時に範囲ダメージ
         if (element == BlockType.Lightning)
             StartCoroutine(LightningSpawnEffect());
     }
@@ -109,6 +136,17 @@ public class MagicProjectile : MonoBehaviour
         if (sr) sr.color = c;
     }
 
+    Color ElementColor() => element switch
+    {
+        BlockType.Fire      => new Color(1f, 0.4f, 0.1f),
+        BlockType.Lightning => new Color(1f, 0.95f, 0.1f),
+        BlockType.Water     => new Color(0.2f, 0.6f, 1f),
+        BlockType.Wood      => new Color(0.2f, 0.8f, 0.2f),
+        BlockType.Earth     => new Color(0.8f, 0.6f, 0.3f),
+        BlockType.Light     => new Color(1f, 0.98f, 0.65f),
+        _                   => Color.white,
+    };
+
     void FindHomingTarget()
     {
         var enemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -122,6 +160,43 @@ public class MagicProjectile : MonoBehaviour
 
     void Update()
     {
+        // Wait: 発射前に一時停止してから動き出す
+        if (isWait && waitRemaining > 0f)
+        {
+            waitRemaining -= Time.deltaTime;
+            rb.linearVelocity = Vector2.zero;
+            if (waitRemaining <= 0f)
+                rb.linearVelocity = moveDir * speed;
+            return;
+        }
+
+        // Grow: 時間とともにスケール拡大
+        if (isGrow)
+        {
+            float t = Mathf.Clamp01((Time.time - spawnTime) / lifetime);
+            transform.localScale = Vector3.one * Mathf.Lerp(0.4f, 2.5f, t);
+        }
+
+        // Return: 一定時間後に引き返す（プレイヤーへホーミング）
+        if (isReturn && !hasReturned)
+        {
+            returnDelay -= Time.deltaTime;
+            if (returnDelay <= 0f)
+            {
+                hasReturned = true;
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null) { isHoming = true; homingTarget = p.transform; }
+            }
+        }
+
+        // Rotate: 移動方向を旋回（Homing/Zigzag中は無効）
+        if (isRotate && !isHoming && !isZigzag)
+        {
+            moveDir = (Quaternion.Euler(0f, 0f, rotateSpeed * Time.deltaTime) * (Vector3)moveDir).normalized;
+            rb.linearVelocity = moveDir * speed;
+        }
+
+        // Homing
         if (isHoming && homingTarget != null)
         {
             Vector2 toTarget = ((Vector2)homingTarget.position - (Vector2)transform.position).normalized;
@@ -129,6 +204,7 @@ public class MagicProjectile : MonoBehaviour
             rb.linearVelocity = moveDir * speed;
         }
 
+        // Zigzag
         if (isZigzag)
         {
             zigzagTimer += Time.deltaTime * 4f;
@@ -144,6 +220,19 @@ public class MagicProjectile : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             if (hitEnemies.Contains(other.gameObject)) return;
+
+            // OnHit: 敵に貼り付いて1秒後に発動（粘着爆弾）
+            if (isOnHit && !isStuck)
+            {
+                isStuck = true;
+                hitEnemies.Add(other.gameObject);
+                rb.linearVelocity = Vector2.zero;
+                rb.isKinematic = true;
+                transform.SetParent(other.transform);
+                StartCoroutine(DelayedHit(other.gameObject, 1.0f));
+                return;
+            }
+
             hitEnemies.Add(other.gameObject);
             HitEnemy(other.gameObject);
             if (!isPiercing) Destroy(gameObject);
@@ -178,8 +267,8 @@ public class MagicProjectile : MonoBehaviour
                 SplitProjectile();
                 break;
             case BlockType.Wood:
-                var rb2 = enemy.GetComponent<Rigidbody2D>();
-                if (rb2) StartCoroutine(SlowEnemy(rb2, 2f));
+                var slow = enemy.GetComponent<SlowEffect>() ?? enemy.AddComponent<SlowEffect>();
+                slow.StartSlow(2f);
                 break;
         }
 
@@ -191,11 +280,15 @@ public class MagicProjectile : MonoBehaviour
                 case BlockType.Explode: Explode(); break;
                 case BlockType.Split:   SplitProjectile(); break;
                 case BlockType.Attract: Attract(enemy); break;
+                case BlockType.Stop:
+                    var freeze = enemy.GetComponent<StopEffect>() ?? enemy.AddComponent<StopEffect>();
+                    freeze.StartFreeze(2.5f);
+                    break;
             }
         }
 
         var stats = enemy.GetComponent<EnemyStats>();
-        if (stats) stats.TakeDamage(damage);
+        if (stats) stats.TakeDamage(damage, ElementColor());
     }
 
     void Explode()
@@ -205,9 +298,8 @@ public class MagicProjectile : MonoBehaviour
             if (h.CompareTag("Enemy"))
             {
                 var s = h.GetComponent<EnemyStats>();
-                if (s) s.TakeDamage(damage * 0.6f);
+                if (s) s.TakeDamage(damage * 0.6f, ElementColor());
             }
-        // TODO: 爆発エフェクト
     }
 
     void SplitProjectile()
@@ -220,7 +312,7 @@ public class MagicProjectile : MonoBehaviour
             if (mp != null)
             {
                 mp.damage = damage * 0.5f;
-                mp.blockSequence = new List<BlockType>(); // 分裂弾はシンプルに
+                mp.blockSequence = new List<BlockType>();
                 mp.Launch(splitDir, new List<BlockType>());
             }
         }
@@ -236,12 +328,13 @@ public class MagicProjectile : MonoBehaviour
         }
     }
 
-    IEnumerator SlowEnemy(Rigidbody2D rb2, float duration)
+    IEnumerator DelayedHit(GameObject enemy, float delay)
     {
-        var originalDrag = rb2.linearDamping;
-        rb2.linearDamping = 10f;
-        yield return new WaitForSeconds(duration);
-        if (rb2) rb2.linearDamping = originalDrag;
+        yield return new WaitForSeconds(delay);
+        transform.SetParent(null);
+        if (enemy != null && enemy.activeInHierarchy)
+            HitEnemy(enemy);
+        Destroy(gameObject);
     }
 
     IEnumerator LightningSpawnEffect()
@@ -252,7 +345,7 @@ public class MagicProjectile : MonoBehaviour
             if (h.CompareTag("Enemy"))
             {
                 var s = h.GetComponent<EnemyStats>();
-                if (s) s.TakeDamage(damage * 0.5f);
+                if (s) s.TakeDamage(damage * 0.5f, ElementColor());
             }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
@@ -8,24 +9,30 @@ public class EnemyStats : MonoBehaviour
 
     void Start() { currentHP = maxHP; }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, Color? popupColor = null)
     {
         currentHP -= amount;
-        ShowDamage(amount);
+        DamagePopup.Show(transform.position + Vector3.up * 0.3f, amount, popupColor ?? Color.white);
         if (currentHP <= 0f) Die();
-    }
-
-    void ShowDamage(float amount)
-    {
-        // ダメージ数値（簡易）
-        Debug.Log($"{gameObject.name} に {amount:F0} ダメージ！残HP: {currentHP:F0}");
     }
 
     void Die()
     {
-        // プレイヤーにEXP付与
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player) player.GetComponent<PlayerStats>()?.GainEXP(expReward);
+        StartCoroutine(DeathEffect());
+    }
+
+    IEnumerator DeathEffect()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = Color.white;
+            yield return null;
+            sr.color = new Color(1f, 0.3f, 0.3f, 0.8f);
+            yield return new WaitForSeconds(0.12f);
+        }
         Destroy(gameObject);
     }
 }
