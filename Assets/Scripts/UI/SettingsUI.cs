@@ -451,13 +451,7 @@ public class SettingsUI : MonoBehaviour
 
     void ApplyToHUD()
     {
-        var sm = SettingsManager.Instance;
-        if (sm == null) return;
         var hud = FindObjectOfType<HUDManager>();
-        if (hud != null)
-        {
-            hud.maxHearts = sm.maxHearts;
-            hud.maxMoons  = sm.maxMoons;
-        }
+        if (hud != null) hud.RebuildHUD();
     }
 }

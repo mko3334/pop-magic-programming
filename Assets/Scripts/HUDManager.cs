@@ -31,6 +31,17 @@ public class HUDManager : MonoBehaviour
         BuildHUD();
     }
 
+    public void RebuildHUD()
+    {
+        var sm = SettingsManager.Instance;
+        if (sm != null) { maxHearts = sm.maxHearts; maxMoons = sm.maxMoons; }
+        heartIcons.Clear();
+        moonIcons.Clear();
+        var existing = transform.Find("HUDRoot");
+        if (existing != null) Destroy(existing.gameObject);
+        BuildHUD();
+    }
+
     void BuildHUD()
     {
         var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");

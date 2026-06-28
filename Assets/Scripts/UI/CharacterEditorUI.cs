@@ -412,8 +412,10 @@ public class CharacterEditorUI : MonoBehaviour
             Destroy(cellBg);
 
             // Rebuild cleanly
-            cell.AddComponent<Image>().color = new Color(0.85f, 0.82f, 0.78f);
+            var bgImg = cell.AddComponent<Image>();
+            bgImg.color = new Color(0.85f, 0.82f, 0.78f);
             var cellBtn = cell.AddComponent<Button>();
+            cellBtn.targetGraphic = bgImg;
             var spriteGO = new GameObject("Sprite");
             spriteGO.transform.SetParent(cell.transform, false);
             var spriteImg = spriteGO.AddComponent<Image>();
