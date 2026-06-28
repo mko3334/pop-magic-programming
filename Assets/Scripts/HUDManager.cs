@@ -24,6 +24,8 @@ public class HUDManager : MonoBehaviour
 
     void Start()
     {
+        var sm = SettingsManager.Instance;
+        if (sm != null) { maxHearts = sm.maxHearts; maxMoons = sm.maxMoons; }
         canvas = GetComponent<Canvas>();
         if (canvas == null) canvas = gameObject.AddComponent<Canvas>();
         BuildHUD();

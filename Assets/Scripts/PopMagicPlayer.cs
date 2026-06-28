@@ -27,6 +27,8 @@ public class PopMagicPlayer : MonoBehaviour
         rb.freezeRotation = true;
         stats = GetComponent<PlayerStats>();
         mainCamera = Camera.main;
+        var sm = SettingsManager.Instance;
+        if (sm != null) { moveSpeed = sm.moveSpeed; mpCostPerShot = sm.mpCost; }
     }
 
     void Update()

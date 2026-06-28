@@ -53,12 +53,12 @@ public class MagicProjectile : MonoBehaviour
             switch (b)
             {
                 // 属性
-                case BlockType.Fire:      element = b; damage = 12f; ApplyColor(new Color(1f,0.4f,0.1f)); break;
-                case BlockType.Lightning: element = b; damage = 20f; ApplyColor(new Color(1f,0.95f,0.1f)); break;
-                case BlockType.Water:     element = b; damage = 8f;  ApplyColor(new Color(0.2f,0.6f,1f)); speed = 5f; break;
-                case BlockType.Wood:      element = b; damage = 10f; ApplyColor(new Color(0.2f,0.8f,0.2f)); break;
-                case BlockType.Earth:     element = b; damage = 25f; ApplyColor(new Color(0.6f,0.45f,0.2f)); speed = 4f; break;
-                case BlockType.Light:     element = b; damage = 10f; ApplyColor(new Color(1f,0.98f,0.65f)); speed = 14f; isPiercing = true; break;
+                case BlockType.Fire:      element = b; damage = Dmg(b); ApplyColor(new Color(1f,0.4f,0.1f)); break;
+                case BlockType.Lightning: element = b; damage = Dmg(b); ApplyColor(new Color(1f,0.95f,0.1f)); break;
+                case BlockType.Water:     element = b; damage = Dmg(b); ApplyColor(new Color(0.2f,0.6f,1f)); speed = 5f; break;
+                case BlockType.Wood:      element = b; damage = Dmg(b); ApplyColor(new Color(0.2f,0.8f,0.2f)); break;
+                case BlockType.Earth:     element = b; damage = Dmg(b); ApplyColor(new Color(0.6f,0.45f,0.2f)); speed = 4f; break;
+                case BlockType.Light:     element = b; damage = Dmg(b); ApplyColor(new Color(1f,0.98f,0.65f)); speed = 14f; isPiercing = true; break;
 
                 // ベクトル
                 case BlockType.Forward:  break; // デフォルト
@@ -79,6 +79,22 @@ public class MagicProjectile : MonoBehaviour
         // 雷は生成時に範囲ダメージ
         if (element == BlockType.Lightning)
             StartCoroutine(LightningSpawnEffect());
+    }
+
+    float Dmg(BlockType b)
+    {
+        var sm = SettingsManager.Instance;
+        if (sm == null) return damage;
+        return b switch
+        {
+            BlockType.Fire      => sm.fireDmg,
+            BlockType.Lightning => sm.lightningDmg,
+            BlockType.Water     => sm.waterDmg,
+            BlockType.Wood      => sm.woodDmg,
+            BlockType.Earth     => sm.earthDmg,
+            BlockType.Light     => sm.lightDmg,
+            _                   => damage,
+        };
     }
 
     void ApplyColor(Color c)

@@ -39,6 +39,7 @@ public class GameMenuDrawer : MonoBehaviour
         overlayGO.SetActive(false);
         drawerPanelGO.SetActive(false);
         MagicProgrammerUI.Instance?.Close();
+        SettingsUI.Instance?.Close();
     }
 
     void BuildUI()
@@ -90,7 +91,7 @@ public class GameMenuDrawer : MonoBehaviour
         MakeTab("魔導書", new Color(1f, 0.71f, 0.71f),   () => { drawerPanelGO.SetActive(false); MagicProgrammerUI.Instance?.Open(); });
         MakeTab("アイテム", new Color(0.68f, 0.94f, 0.68f), () => { });
         MakeTab("図鑑",   new Color(0.68f, 0.88f, 1f),   () => { });
-        MakeTab("設定",   new Color(1f, 0.84f, 0.68f),   () => { });
+        MakeTab("設定",   new Color(1f, 0.84f, 0.68f),   () => { drawerPanelGO.SetActive(false); SettingsUI.Instance?.Open(); });
 
         overlayGO.SetActive(false);
         drawerPanelGO.SetActive(false);

@@ -22,6 +22,8 @@ public class PlayerStats : MonoBehaviour
 
     void Start()
     {
+        var sm = SettingsManager.Instance;
+        if (sm != null) { maxHP = sm.maxHP; maxMP = sm.maxMP; mpRegenRate = sm.mpRegen; }
         currentHP = maxHP;
         currentMP = maxMP;
     }
