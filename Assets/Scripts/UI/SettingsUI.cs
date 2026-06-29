@@ -22,11 +22,16 @@ public class SettingsUI : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    void Start()
+    {
         BuildUI();
     }
 
     public void Open()
     {
+        if (panelRoot == null) BuildUI();
         isOpen = true;
         panelRoot.SetActive(true);
     }

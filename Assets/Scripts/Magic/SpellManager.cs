@@ -12,6 +12,15 @@ public class SpellManager : MonoBehaviour
         new SpellProgram { slotKey = "C" },
     };
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void AutoCreate()
+    {
+        if (Instance != null) return;
+        var go = new GameObject("[SpellManager]");
+        Object.DontDestroyOnLoad(go);
+        go.AddComponent<SpellManager>();
+    }
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
