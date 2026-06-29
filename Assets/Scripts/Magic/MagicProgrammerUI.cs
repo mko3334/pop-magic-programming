@@ -37,6 +37,7 @@ public class MagicProgrammerUI : MonoBehaviour
         if (panelRoot == null) BuildUI();
         isOpen = true;
         panelRoot.SetActive(true);
+        Canvas.ForceUpdateCanvases();
         RefreshAll();
     }
 

@@ -34,6 +34,7 @@ public class SettingsUI : MonoBehaviour
         if (panelRoot == null) BuildUI();
         isOpen = true;
         panelRoot.SetActive(true);
+        Canvas.ForceUpdateCanvases();
     }
 
     public void Close()

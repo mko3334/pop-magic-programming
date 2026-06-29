@@ -19,7 +19,7 @@ public class LevelUpEffect : MonoBehaviour
     public static void Show(int level)
     {
         EnsureCanvas();
-        var go = new GameObject("LvUp");
+        var go = new GameObject("LvUp", typeof(RectTransform));
         go.transform.SetParent(_canvas.transform, false);
         go.AddComponent<LevelUpEffect>().Init(level);
     }
