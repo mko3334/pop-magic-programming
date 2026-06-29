@@ -16,6 +16,15 @@ public class CharacterStyleManager : MonoBehaviour
     float enemyFps = 8f;
     string magicSpriteName = "";
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void AutoCreate()
+    {
+        if (Instance != null) return;
+        var go = new GameObject("[CharacterStyleManager]");
+        Object.DontDestroyOnLoad(go);
+        go.AddComponent<CharacterStyleManager>();
+    }
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }

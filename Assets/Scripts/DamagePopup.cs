@@ -21,7 +21,7 @@ public class DamagePopup : MonoBehaviour
     public static void Show(Vector3 worldPos, float damage, Color color)
     {
         EnsureCanvas();
-        var go = new GameObject("Dmg");
+        var go = new GameObject("Dmg", typeof(RectTransform));
         go.transform.SetParent(_canvas.transform, false);
         go.AddComponent<DamagePopup>().Init(worldPos, damage, color);
     }

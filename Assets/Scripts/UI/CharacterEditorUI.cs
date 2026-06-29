@@ -33,13 +33,19 @@ public class CharacterEditorUI : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    void Start()
+    {
         BuildUI();
     }
 
     public void Open()
     {
+        if (panelRoot == null) BuildUI();
         isOpen = true;
         panelRoot.SetActive(true);
+        Canvas.ForceUpdateCanvases();
         LoadFromTarget();
         RefreshFrameList();
     }
