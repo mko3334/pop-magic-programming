@@ -207,6 +207,7 @@ public class MagicProgrammerUI : MonoBehaviour
         BuildCategory(contentGO.transform, "トリガー",     new Color(1f, 0.92f, 0.58f),    BlockCategory.Trigger);
         BuildCategory(contentGO.transform, "アクション",   new Color(0.82f, 0.68f, 1f),    BlockCategory.Action);
         BuildCategory(contentGO.transform, "制御",         new Color(0.68f, 0.94f, 0.68f), BlockCategory.Control);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRT);
     }
 
     void BuildCategory(Transform parent, string label, Color color, BlockCategory category)
@@ -242,7 +243,8 @@ public class MagicProgrammerUI : MonoBehaviour
         glg.constraintCount = 3;
         glg.padding = new RectOffset(6, 6, 6, 6);
         gridGO.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        gridGO.AddComponent<LayoutElement>().flexibleWidth = 1f;
+        var gridLE = gridGO.AddComponent<LayoutElement>();
+        gridLE.flexibleWidth = 1f;
 
         foreach (var block in MagicBlockLibrary.All.FindAll(b => b.category == category))
         {
@@ -250,6 +252,7 @@ public class MagicProgrammerUI : MonoBehaviour
             var icon = BuildBlockIcon(gridGO.transform, b, 76f);
             icon.GetComponent<Button>().onClick.AddListener(() => AddBlockToChain(b.type));
         }
+        LayoutRebuilder.ForceRebuildLayoutImmediate(gridGO.GetComponent<RectTransform>());
     }
 
     GameObject BuildBlockIcon(Transform parent, MagicBlock block, float size)
@@ -457,6 +460,7 @@ public class MagicProgrammerUI : MonoBehaviour
                 arrowT.raycastTarget = false;
             }
         }
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRT);
     }
 
     // ─── インタラクション ─────────────────────────

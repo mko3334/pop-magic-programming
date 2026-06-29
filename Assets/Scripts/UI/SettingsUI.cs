@@ -173,36 +173,37 @@ public class SettingsUI : MonoBehaviour
         scroll.vertical = true;
         scroll.scrollSensitivity = 40f;
 
-        var sm = SettingsManager.Instance;
-
+        // SettingsManager.Instance をラムダ内で毎回参照（null安全）
         // ── プレイヤー ──
         BuildSectionHeader(contentGO.transform, "プレイヤー", HEADER_PLAYER);
         int rowIdx = 0;
-        MakeRow(contentGO.transform, "体力 (HP)",   10f, 500f, 10f, true,  rowIdx++, () => sm.maxHP,     v => { sm.maxHP = v;     ApplyToPlayer(); });
-        MakeRow(contentGO.transform, "MP",           10f, 500f, 10f, true,  rowIdx++, () => sm.maxMP,     v => { sm.maxMP = v;     ApplyToPlayer(); });
-        MakeRow(contentGO.transform, "移動速度",      1f,  20f,  0.5f,false, rowIdx++, () => sm.moveSpeed, v => { sm.moveSpeed = v; ApplyToPlayer(); });
-        MakeRow(contentGO.transform, "MP回復速度",    0f,  50f,  1f,  false, rowIdx++, () => sm.mpRegen,   v => { sm.mpRegen = v;   ApplyToPlayer(); });
-        MakeRow(contentGO.transform, "魔法MPコスト",  0f, 100f,  5f,  true,  rowIdx++, () => sm.mpCost,    v => { sm.mpCost = v;    ApplyToPlayer(); });
+        MakeRow(contentGO.transform, "体力 (HP)",   10f, 500f, 10f, true,  rowIdx++, () => SettingsManager.Instance.maxHP,     v => { SettingsManager.Instance.maxHP = v;     ApplyToPlayer(); });
+        MakeRow(contentGO.transform, "MP",           10f, 500f, 10f, true,  rowIdx++, () => SettingsManager.Instance.maxMP,     v => { SettingsManager.Instance.maxMP = v;     ApplyToPlayer(); });
+        MakeRow(contentGO.transform, "移動速度",      1f,  20f,  0.5f,false, rowIdx++, () => SettingsManager.Instance.moveSpeed, v => { SettingsManager.Instance.moveSpeed = v; ApplyToPlayer(); });
+        MakeRow(contentGO.transform, "MP回復速度",    0f,  50f,  1f,  false, rowIdx++, () => SettingsManager.Instance.mpRegen,   v => { SettingsManager.Instance.mpRegen = v;   ApplyToPlayer(); });
+        MakeRow(contentGO.transform, "魔法MPコスト",  0f, 100f,  5f,  true,  rowIdx++, () => SettingsManager.Instance.mpCost,    v => { SettingsManager.Instance.mpCost = v;    ApplyToPlayer(); });
 
         // ── 魔法ダメージ ──
         BuildSectionHeader(contentGO.transform, "魔法ダメージ", HEADER_MAGIC);
-        MakeRow(contentGO.transform, "🔥 炎",   1f, 200f, 1f, true, rowIdx++, () => sm.fireDmg,      v => sm.fireDmg = v);
-        MakeRow(contentGO.transform, "⚡ 雷",   1f, 200f, 1f, true, rowIdx++, () => sm.lightningDmg, v => sm.lightningDmg = v);
-        MakeRow(contentGO.transform, "💧 水",   1f, 200f, 1f, true, rowIdx++, () => sm.waterDmg,     v => sm.waterDmg = v);
-        MakeRow(contentGO.transform, "🌿 木",   1f, 200f, 1f, true, rowIdx++, () => sm.woodDmg,      v => sm.woodDmg = v);
-        MakeRow(contentGO.transform, "🪨 土",   1f, 200f, 1f, true, rowIdx++, () => sm.earthDmg,     v => sm.earthDmg = v);
-        MakeRow(contentGO.transform, "✨ 光",   1f, 200f, 1f, true, rowIdx++, () => sm.lightDmg,     v => sm.lightDmg = v);
+        MakeRow(contentGO.transform, "🔥 炎",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.fireDmg,      v => SettingsManager.Instance.fireDmg = v);
+        MakeRow(contentGO.transform, "⚡ 雷",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.lightningDmg, v => SettingsManager.Instance.lightningDmg = v);
+        MakeRow(contentGO.transform, "💧 水",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.waterDmg,     v => SettingsManager.Instance.waterDmg = v);
+        MakeRow(contentGO.transform, "🌿 木",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.woodDmg,      v => SettingsManager.Instance.woodDmg = v);
+        MakeRow(contentGO.transform, "🪨 土",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.earthDmg,     v => SettingsManager.Instance.earthDmg = v);
+        MakeRow(contentGO.transform, "✨ 光",   1f, 200f, 1f, true, rowIdx++, () => SettingsManager.Instance.lightDmg,     v => SettingsManager.Instance.lightDmg = v);
 
         // ── HUD ──
         BuildSectionHeader(contentGO.transform, "HUD表示", HEADER_HUD);
-        MakeRow(contentGO.transform, "ハート数", 1f, 10f, 1f, true, rowIdx++, () => sm.maxHearts, v => { sm.maxHearts = (int)v; ApplyToHUD(); });
-        MakeRow(contentGO.transform, "月数",     1f, 10f, 1f, true, rowIdx++, () => sm.maxMoons,  v => { sm.maxMoons  = (int)v; ApplyToHUD(); });
+        MakeRow(contentGO.transform, "ハート数", 1f, 10f, 1f, true, rowIdx++, () => SettingsManager.Instance.maxHearts, v => { SettingsManager.Instance.maxHearts = (int)v; ApplyToHUD(); });
+        MakeRow(contentGO.transform, "月数",     1f, 10f, 1f, true, rowIdx++, () => SettingsManager.Instance.maxMoons,  v => { SettingsManager.Instance.maxMoons  = (int)v; ApplyToHUD(); });
 
         // キャラクター編集ボタン
         BuildCharacterEditorButton(contentGO.transform);
 
         // リセットボタン
         BuildResetButton(contentGO.transform);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRT);
     }
 
     void BuildSectionHeader(Transform parent, string label, Color color)
