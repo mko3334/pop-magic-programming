@@ -24,6 +24,7 @@ public class HUDManager : MonoBehaviour
 
     void Start()
     {
+        if (playerStats == null) playerStats = FindObjectOfType<PlayerStats>();
         var sm = SettingsManager.Instance;
         if (sm != null) { maxHearts = sm.maxHearts; maxMoons = sm.maxMoons; }
         canvas = GetComponent<Canvas>();
@@ -126,7 +127,7 @@ public class HUDManager : MonoBehaviour
 
     void Update()
     {
-        if (playerStats == null) return;
+        if (playerStats == null) { playerStats = FindObjectOfType<PlayerStats>(); return; }
 
         // ハートの表示（HP割合でON/OFF）
         float hpRatio = playerStats.currentHP / playerStats.maxHP;

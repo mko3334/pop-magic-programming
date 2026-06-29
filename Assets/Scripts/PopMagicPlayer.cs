@@ -30,6 +30,37 @@ public class PopMagicPlayer : MonoBehaviour
         var sm = SettingsManager.Instance;
         if (sm != null) { moveSpeed = sm.moveSpeed; mpCostPerShot = sm.mpCost; }
         CharacterStyleManager.Instance?.ApplyToPlayer();
+        if (projectilePrefab == null) projectilePrefab = CreateDefaultProjectile();
+    }
+
+    GameObject CreateDefaultProjectile()
+    {
+        var go = new GameObject("DefaultProjectile");
+        go.SetActive(false);
+        var rb2 = go.AddComponent<Rigidbody2D>();
+        rb2.gravityScale = 0f;
+        rb2.freezeRotation = true;
+        var col = go.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.15f;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = CreateCircleSprite(32);
+        sr.color = new Color(1f, 0.8f, 0.2f);
+        go.AddComponent<MagicProjectile>();
+        DontDestroyOnLoad(go);
+        return go;
+    }
+
+    Sprite CreateCircleSprite(int size)
+    {
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        float c = size / 2f - 0.5f, r = size / 2f - 1f;
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+                tex.SetPixel(x, y, Vector2.Distance(new Vector2(x, y), new Vector2(c, c)) <= r
+                    ? Color.white : Color.clear);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size / 0.3f);
     }
 
     void Update()
