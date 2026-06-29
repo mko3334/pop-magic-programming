@@ -22,13 +22,19 @@ public class SettingsUI : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    void Start()
+    {
         BuildUI();
     }
 
     public void Open()
     {
+        if (panelRoot == null) BuildUI();
         isOpen = true;
         panelRoot.SetActive(true);
+        Canvas.ForceUpdateCanvases();
     }
 
     public void Close()
@@ -145,8 +151,7 @@ public class SettingsUI : MonoBehaviour
         vpRT.anchorMin = Vector2.zero;
         vpRT.anchorMax = Vector2.one;
         vpRT.sizeDelta = Vector2.zero;
-        vpGO.AddComponent<Image>().color = Color.clear;
-        vpGO.AddComponent<Mask>().showMaskGraphic = false;
+        vpGO.AddComponent<RectMask2D>();
 
         var contentGO = new GameObject("Content");
         contentGO.transform.SetParent(vpGO.transform, false);
